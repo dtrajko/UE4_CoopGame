@@ -28,6 +28,8 @@ void ASWeapon::Fire()
 {
 	// Trace the world from pawn eyes to crosshair location
 
+	UE_LOG(LogTemp, Warning, TEXT("Weapon Fire!"));
+
 	AActor* MyOwner = GetOwner();
 	if (MyOwner)
 	{
@@ -36,7 +38,6 @@ void ASWeapon::Fire()
 		MyOwner->GetActorEyesViewPoint(EyeLocation, EyeRotation);
 
 		FVector ShotDirection = EyeRotation.Vector();
-
 		FVector TraceEnd = EyeLocation + (ShotDirection * 10000);
 
 		FCollisionQueryParams QueryParams;
@@ -46,12 +47,16 @@ void ASWeapon::Fire()
 
 		FHitResult Hit;
 		bool bBlockingHit = GetWorld()->LineTraceSingleByChannel(Hit, EyeLocation, TraceEnd, ECC_Visibility, QueryParams);
+
+		UE_LOG(LogTemp, Warning, TEXT("Blocking Hit!"));
+
 		if (bBlockingHit)
 		{
 			// Blocking hit! Process damage
 			AActor* HitActor = Hit.GetActor();
 
-			UGameplayStatics::ApplyPointDamage(HitActor, 20.0f, ShotDirection, Hit, MyOwner->GetInstigatorController(), this, DamageType);
+			UGameplayStatics::ApplyPointDamage(HitActor, 20.0f, ShotDirection, Hit, MyOwner->GetInstigatorController(), MyOwner, DamageType);
+			UE_LOG(LogTemp, Warning, TEXT("PointDamage Applied!"));
 		}
 
 		DrawDebugLine(GetWorld(), EyeLocation, TraceEnd, FColor::Green, false, 1.0f, 0, 1.0f);
