@@ -28,9 +28,8 @@ void ASWeapon::Fire()
 {
 	// Trace the world from pawn eyes to crosshair location
 
-	UE_LOG(LogTemp, Warning, TEXT("Weapon Fire!"));
-
 	AActor* MyOwner = GetOwner();
+
 	if (MyOwner)
 	{
 		FVector EyeLocation;
@@ -47,8 +46,6 @@ void ASWeapon::Fire()
 
 		FHitResult Hit;
 		bool bBlockingHit = GetWorld()->LineTraceSingleByChannel(Hit, EyeLocation, TraceEnd, ECC_Visibility, QueryParams);
-
-		UE_LOG(LogTemp, Warning, TEXT("Blocking Hit!"));
 
 		if (bBlockingHit)
 		{
