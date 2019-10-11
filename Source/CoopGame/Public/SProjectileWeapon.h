@@ -16,7 +16,7 @@ class COOPGAME_API ASProjectileWeapon : public ASWeapon
 
 public:
 
-	virtual void Fire() override;
+	void Fire();
 
 
 protected:
