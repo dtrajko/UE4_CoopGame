@@ -112,6 +112,9 @@ void ASCharacter::Tick(float DeltaTime)
 	FVector EyeLocation;
 	FRotator EyeRotation;
 	GetActorEyesViewPoint(EyeLocation, EyeRotation);
+	// Rotate Character along the Yaw axis according to current Camera Yaw value
+	// FRotator CurrentRotation = GetActorRotation();
+	// FRotator NewCharacterRotation = FRotator(CurrentRotation.Pitch, EyeRotation.Yaw, CurrentRotation.Roll);
 	SetActorRotation(EyeRotation);
 }
 
