@@ -25,7 +25,7 @@ ASWeapon::ASWeapon()
 	TracerTargetName = "BeamEnd";
 
 	BaseDamage = 20.0f;
-	RateOfFire = 600;
+	RateOfFire = 60;
 }
 
 void ASWeapon::BeginPlay()
