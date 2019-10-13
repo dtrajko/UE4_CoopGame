@@ -69,8 +69,9 @@ void ASDamageableCube::OnRep_Exploded()
 	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ExplosionEffect, GetActorLocation());
 	// Override material on mesh with blackened version
 	MeshComp->SetMaterial(0, ExplodedMaterial);
-}
 
+	Destroy();
+}
 
 void ASDamageableCube::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
