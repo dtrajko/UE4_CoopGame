@@ -26,6 +26,8 @@ ASWeapon::ASWeapon()
 
 	BaseDamage = 20.0f;
 	RateOfFire = 60;
+
+	SetReplicates(true);
 }
 
 void ASWeapon::BeginPlay()
@@ -106,6 +108,12 @@ void ASWeapon::Fire()
 		PlayFireEffects(TracerEndPoint);
 
 		LastFireTime = GetWorld()->TimeSeconds;
+
+		// try and play the sound if specified
+		if (FireSound != nullptr)
+		{
+			UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
+		}
 	}
 }
 

@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "SExplosiveBarrel.generated.h"
+#include "SDamageableCube.generated.h"
 
 
 class USHealthComponent;
@@ -14,47 +14,47 @@ class UParticleSystem;
 
 
 UCLASS()
-class COOPGAME_API ASExplosiveBarrel : public AActor
+class COOPGAME_API ASDamageableCube : public AActor
 {
 	GENERATED_BODY()
 
 public:
 	// Sets default values for this actor's properties
-	ASExplosiveBarrel();
+	ASDamageableCube();
 
 protected:
 
 	UPROPERTY(VisibleAnywhere, Category = "Components")
-	USHealthComponent* HealthComp;
+		USHealthComponent* HealthComp;
 
 	UPROPERTY(VisibleAnywhere, Category = "Components")
-	UStaticMeshComponent* MeshComp;
+		UStaticMeshComponent* MeshComp;
 
 	UPROPERTY(VisibleAnywhere, Category = "Components")
-	URadialForceComponent* RadialForceComp;
+		URadialForceComponent* RadialForceComp;
 
 	UFUNCTION()
-	void OnHealthChanged(USHealthComponent* OwningHealthComp, float Health, float HealthDelta, const class UDamageType* DamageType,
-		class AController* InstigatedBy, AActor* DamageCauser);
+		void OnHealthChanged(USHealthComponent* OwningHealthComp, float Health, float HealthDelta, const class UDamageType* DamageType,
+			class AController* InstigatedBy, AActor* DamageCauser);
 
 	UPROPERTY(ReplicatedUsing = OnRep_Exploded)
-	bool bExploded;
+		bool bExploded;
 
 	UFUNCTION()
-	void OnRep_Exploded();
+		void OnRep_Exploded();
 
 	/* Impulse applied to the barrel mesh when it explodes to boost it up a little */
 	UPROPERTY(EditDefaultsOnly, Category = "FX")
-	float ExplosionImpulse;
+		float ExplosionImpulse;
 
 	/* Particle to play when health reached zero */
 	UPROPERTY(EditDefaultsOnly, Category = "FX")
-	UParticleSystem* ExplosionEffect;
+		UParticleSystem* ExplosionEffect;
 
 	/* The material to replace the original on the mesh once exploded (a blackened version) */
 	UPROPERTY(EditDefaultsOnly, Category = "FX")
-	UMaterialInterface* ExplodedMaterial;
+		UMaterialInterface* ExplodedMaterial;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FX")
-	class USoundBase* ExplosionSound;
+		class USoundBase* ExplosionSound;
 };

@@ -10,6 +10,8 @@
 #include "Components/SHealthComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/PawnMovementComponent.h"
+#include "GameFramework/Character.h"
+#include "Net/UnrealNetwork.h"
 
 
 // Sets default values
@@ -48,19 +50,21 @@ void ASCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	DefaultFOV = CameraComp->FieldOfView;
-
-	// Spawn a default weapon
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-
-	CurrentWeapon = GetWorld()->SpawnActor<ASWeapon>(StarterWeaponClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
-	if (CurrentWeapon)
-	{
-		CurrentWeapon->SetOwner(this);
-		CurrentWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponAttachSocketName);
-	}
-
 	HealthComp->OnHealthChanged.AddDynamic(this, &ASCharacter::OnHealthChanged);
+
+	if (Role == ROLE_Authority)
+	{
+		// Spawn a default weapon
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+		CurrentWeapon = GetWorld()->SpawnActor<ASWeapon>(StarterWeaponClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+		if (CurrentWeapon)
+		{
+			CurrentWeapon->SetOwner(this);
+			CurrentWeapon->AttachToComponent(Cast<USceneComponent>(GetMesh()), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponAttachSocketName);
+		}
+	}
 }
 
 void ASCharacter::MoveForward(float Value)
@@ -138,13 +142,13 @@ void ASCharacter::Tick(float DeltaTime)
 	float NewFOV = FMath::FInterpTo(CameraComp->FieldOfView, TargetFOV, DeltaTime, ZoomInterpSpeed);
 	CameraComp->SetFieldOfView(NewFOV);
 
-	FVector EyeLocation;
-	FRotator EyeRotation;
-	GetActorEyesViewPoint(EyeLocation, EyeRotation);
-	// Rotate Character along the Yaw axis according to current Camera Yaw value
+	// FVector EyeLocation;
+	// FRotator EyeRotation;
+	// GetActorEyesViewPoint(EyeLocation, EyeRotation);
+	// // Rotate Character along the Yaw axis according to current Camera Yaw value
 	// FRotator CurrentRotation = GetActorRotation();
 	// FRotator NewCharacterRotation = FRotator(CurrentRotation.Pitch, EyeRotation.Yaw, CurrentRotation.Roll);
-	SetActorRotation(EyeRotation);
+	// SetActorRotation(EyeRotation);
 }
 
 // Called to bind functionality to input
@@ -178,4 +182,11 @@ FVector ASCharacter::GetPawnViewLocation() const
 	}
 
 	return Super::GetPawnViewLocation();
+}
+
+void ASCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ASCharacter, CurrentWeapon);
 }

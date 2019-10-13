@@ -57,6 +57,7 @@ protected:
 
 	void EndZoom();
 
+	UPROPERTY(Replicated)
 	ASWeapon* CurrentWeapon;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Player")
@@ -76,6 +77,7 @@ protected:
 	UPROPERTY(BlueprintReadOnly, Category = "Player")
 	bool bDied;
 
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -84,5 +86,7 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	virtual FVector GetPawnViewLocation() const override;
+
+	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const;
 
 };

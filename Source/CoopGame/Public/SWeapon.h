@@ -70,11 +70,14 @@ protected:
 
 	void Fire();
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
+	class USoundBase* FireSound;
+
 
 public:
 
-	void StartFire();
+	virtual void StartFire();
 
-	void StopFire();
+	virtual void StopFire();
 
 };

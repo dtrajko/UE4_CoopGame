@@ -1,6 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "SExplosiveBarrel.h"
+#include "SDamageableCube.h"
 #include "SHealthComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "PhysicsEngine/RadialForceComponent.h"
@@ -8,10 +8,10 @@
 
 
 // Sets default values
-ASExplosiveBarrel::ASExplosiveBarrel()
+ASDamageableCube::ASDamageableCube()
 {
 	HealthComp = CreateDefaultSubobject<USHealthComponent>(TEXT("HealthComp"));
-	HealthComp->OnHealthChanged.AddDynamic(this, &ASExplosiveBarrel::OnHealthChanged);
+	HealthComp->OnHealthChanged.AddDynamic(this, &ASDamageableCube::OnHealthChanged);
 
 	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));
 	MeshComp->SetSimulatePhysics(true);
@@ -21,18 +21,18 @@ ASExplosiveBarrel::ASExplosiveBarrel()
 
 	RadialForceComp = CreateDefaultSubobject<URadialForceComponent>(TEXT("RadialForceComp"));
 	RadialForceComp->SetupAttachment(MeshComp);
-	RadialForceComp->Radius = 250;
+	RadialForceComp->Radius = 0;
 	RadialForceComp->bImpulseVelChange = true;
 	RadialForceComp->bAutoActivate = false; // Prevent component from ticking, and only use FireImpulse() instead
 	RadialForceComp->bIgnoreOwningActor = true; // ignore self
 
-	ExplosionImpulse = 400;
+	ExplosionImpulse = 0;
 
 	SetReplicates(true);
 	SetReplicateMovement(true);
 }
 
-void ASExplosiveBarrel::OnHealthChanged(USHealthComponent* OwningHealthComp, float Health, float HealthDelta, const class UDamageType* DamageType,
+void ASDamageableCube::OnHealthChanged(USHealthComponent* OwningHealthComp, float Health, float HealthDelta, const class UDamageType* DamageType,
 	class AController* InstigatedBy, AActor* DamageCauser)
 {
 	if (bExploded)
@@ -59,11 +59,11 @@ void ASExplosiveBarrel::OnHealthChanged(USHealthComponent* OwningHealthComp, flo
 			UGameplayStatics::PlaySoundAtLocation(this, ExplosionSound, GetActorLocation());
 		}
 
-		// @TODO: Apply radial damage
+		Destroy();
 	}
 }
 
-void ASExplosiveBarrel::OnRep_Exploded()
+void ASDamageableCube::OnRep_Exploded()
 {
 	// Play FX and change self material to black
 	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ExplosionEffect, GetActorLocation());
@@ -72,9 +72,9 @@ void ASExplosiveBarrel::OnRep_Exploded()
 }
 
 
-void ASExplosiveBarrel::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+void ASDamageableCube::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME(ASExplosiveBarrel, bExploded);
+	DOREPLIFETIME(ASDamageableCube, bExploded);
 }
