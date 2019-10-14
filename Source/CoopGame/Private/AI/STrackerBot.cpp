@@ -3,6 +3,11 @@
 
 #include "STrackerBot.h"
 #include "Components/StaticMeshComponent.h"
+#include "..\..\Public\AI\STrackerBot.h"
+#include <Runtime\Engine\Classes\Kismet\GameplayStatics.h>
+#include <Runtime\NavigationSystem\Public\NavigationSystem.h>
+#include <Runtime\NavigationSystem\Public\NavigationPath.h>
+#include "NavigationSystem.h"
 
 
 // Sets default values
@@ -21,6 +26,26 @@ void ASTrackerBot::BeginPlay()
 {
 	Super::BeginPlay();
 	
+}
+
+FVector ASTrackerBot::GetNextPathPoint()
+{
+	// Hack, to get player location
+	AActor* BestTarget = nullptr;
+
+	if (BestTarget)
+	{
+		UNavigationPath* NavPath = UNavigationSystemV1::FindPathToActorSynchronously(this, GetActorLocation(), BestTarget);
+
+		if (NavPath->PathPoints.Num() > 1)
+		{
+			// Return next point in the path
+			return NavPath->PathPoints[1];
+		}
+	}
+
+	// Failed to find path
+	return GetActorLocation();
 }
 
 // Called every frame
