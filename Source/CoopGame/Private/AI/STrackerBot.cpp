@@ -8,6 +8,8 @@
 #include <Runtime\NavigationSystem\Public\NavigationSystem.h>
 #include <Runtime\NavigationSystem\Public\NavigationPath.h>
 #include "NavigationSystem.h"
+#include "GameFramework/Character.h"
+#include "Components/SHealthComponent.h"
 
 
 // Sets default values
@@ -26,22 +28,19 @@ void ASTrackerBot::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	FVector NextPoint = GetNextPathPoint();
 }
 
 FVector ASTrackerBot::GetNextPathPoint()
 {
-	// Hack, to get player location
-	AActor* BestTarget = nullptr;
+	ACharacter* PlayerPawn = UGameplayStatics::GetPlayerCharacter(this, 0);
 
-	if (BestTarget)
+	UNavigationPath* NavPath = UNavigationSystemV1::FindPathToActorSynchronously(GetWorld(), GetActorLocation(), PlayerPawn);
+
+	if (NavPath && NavPath->PathPoints.Num() > 1)
 	{
-		UNavigationPath* NavPath = UNavigationSystemV1::FindPathToActorSynchronously(this, GetActorLocation(), BestTarget);
-
-		if (NavPath->PathPoints.Num() > 1)
-		{
-			// Return next point in the path
-			return NavPath->PathPoints[1];
-		}
+		// Return next point in the path
+		return NavPath->PathPoints[1];
 	}
 
 	// Failed to find path
