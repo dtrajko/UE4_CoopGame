@@ -8,6 +8,7 @@
 
 
 class USHealthComponent;
+class UMaterialInstanceDynamic;
 
 
 UCLASS()
@@ -47,7 +48,8 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "TrackerBot")
 	float RequiredDistanceToTarget;
 
-
+	// Dynamic material to pulse on damage
+	UMaterialInstanceDynamic* MatInst;
 
 public:	
 	// Called every frame
