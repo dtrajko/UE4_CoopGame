@@ -23,17 +23,6 @@ ASTrackerBot::ASTrackerBot()
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	MovementForce = 200.0f;
-	bUseVelocityChange = true;
-	RequiredDistanceToTarget = 100.0f;
-
-	bExploded = false;
-	ExplosionRadius = 200.0f;
-	ExplosionDamage = 40.0f;
-
-	bStartedSelfDestruction = false;
-	SelfDamageInterval = 0.25f;
-
 	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));
 	MeshComp->SetCanEverAffectNavigation(false);
 	MeshComp->SetSimulatePhysics(true);
@@ -43,11 +32,22 @@ ASTrackerBot::ASTrackerBot()
 	HealthComp->OnHealthChanged.AddDynamic(this, &ASTrackerBot::HandleTakeDamage);
 
 	SphereComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
-	SphereComp->SetSphereRadius(ExplosionRadius);
+	SphereComp->SetSphereRadius(200);
 	SphereComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	SphereComp->SetCollisionResponseToAllChannels(ECR_Ignore);
 	SphereComp->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 	SphereComp->SetupAttachment(RootComponent);
+
+	bUseVelocityChange = false;
+	MovementForce = 200.0f;
+	RequiredDistanceToTarget = 100.0f;
+
+	bExploded = false;
+	ExplosionDamage = 40.0f;
+	ExplosionRadius = 250;
+
+	bStartedSelfDestruction = false;
+	SelfDamageInterval = 0.25f;
 }
 
 // Called when the game starts or when spawned
