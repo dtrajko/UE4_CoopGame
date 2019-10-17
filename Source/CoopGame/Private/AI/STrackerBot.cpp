@@ -39,8 +39,8 @@ ASTrackerBot::ASTrackerBot()
 	SphereComp->SetupAttachment(RootComponent);
 
 	bUseVelocityChange = false;
-	MovementForce = 200.0f;
-	RequiredDistanceToTarget = 100.0f;
+	MovementForce = 2000;
+	RequiredDistanceToTarget = 200.0f;
 
 	bExploded = false;
 	ExplosionDamage = 40.0f;
@@ -55,8 +55,11 @@ void ASTrackerBot::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	// Find initial move to
-	NextPathPoint = GetNextPathPoint();
+	if (Role == ROLE_Authority)
+	{
+		// Find initial move to
+		NextPathPoint = GetNextPathPoint();	
+	}
 }
 
 void ASTrackerBot::HandleTakeDamage(USHealthComponent* OwningHealthComp, float Health, float HealthDelta, const class UDamageType* DamageType,
@@ -109,7 +112,19 @@ void ASTrackerBot::SelfDestruct()
 	if (ExplosionEffect)
 	{
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ExplosionEffect, GetActorLocation());
+	}
 
+	if (ExplodeSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, ExplodeSound, GetActorLocation());
+	}
+
+	MeshComp->SetVisibility(false, true);
+	MeshComp->SetSimulatePhysics(false);
+	MeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	if (Role == ROLE_Authority)
+	{
 		TArray<AActor*> IgnoredActors;
 		IgnoredActors.Add(this);
 
@@ -118,10 +133,7 @@ void ASTrackerBot::SelfDestruct()
 
 		DrawDebugSphere(GetWorld(), GetActorLocation(), ExplosionRadius, 12, FColor::Blue, false, 2.0f, 0, 1.0f);
 
-		UGameplayStatics::PlaySoundAtLocation(this, ExplodeSound, GetActorLocation());
-
-		// Delete Actor immediately
-		Destroy();
+		SetLifeSpan(2.0f);
 	}
 }
 
@@ -137,50 +149,53 @@ void ASTrackerBot::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	float DistanceToTarget = (GetActorLocation() - NextPathPoint).Size();
-
-	if (DistanceToTarget <= RequiredDistanceToTarget)
+	if (Role == ROLE_Authority && !bExploded)
 	{
-		NextPathPoint = GetNextPathPoint();
+		float DistanceToTarget = (GetActorLocation() - NextPathPoint).Size();
 
-		// DrawDebugString(GetWorld(), GetActorLocation(), "Target reached!");
+		if (DistanceToTarget <= RequiredDistanceToTarget)
+		{
+			NextPathPoint = GetNextPathPoint();
+			DrawDebugString(GetWorld(), GetActorLocation(), "Target reached!", nullptr, FColor::Blue, 1.0f);
+		}
+		else
+		{
+			// Keep moving towards next target
+			FVector ForceDirection = NextPathPoint - GetActorLocation();
+			ForceDirection.Normalize();
+			ForceDirection *= MovementForce;
+
+			MeshComp->AddForce(ForceDirection, NAME_None, bUseVelocityChange);
+
+			DrawDebugDirectionalArrow(GetWorld(), GetActorLocation(), GetActorLocation() + ForceDirection, 32, FColor::Yellow, false, 0.0f, 0, 1.0f);
+		}
+
+		DrawDebugSphere(GetWorld(), NextPathPoint, 20, 12, FColor::Yellow, false, 0.0f, 1.0f);
 	}
-	else
-	{
-		// Keep moving towards next target
-		FVector ForceDirection = NextPathPoint - GetActorLocation();
-		ForceDirection.Normalize();
-		ForceDirection *= MovementForce;
-
-		MeshComp->AddForce(ForceDirection, NAME_None, bUseVelocityChange);
-
-		DrawDebugDirectionalArrow(GetWorld(), GetActorLocation(), GetActorLocation() + ForceDirection, 32, FColor::Yellow, false, 1.0f, 0, 1.0f);
-	}
-
-	DrawDebugSphere(GetWorld(), NextPathPoint, 20, 12, FColor::Yellow, false, 1.0f, 1.0f);
 }
 
 void ASTrackerBot::NotifyActorBeginOverlap(AActor* OtherActor)
 {
 	Super::NotifyActorBeginOverlap(OtherActor);
 
-	if (bStartedSelfDestruction)
+	if (!bStartedSelfDestruction && !bExploded)
 	{
-		return;
-	}
+		ASCharacter* PlayerPawn = Cast<ASCharacter>(OtherActor);
+		if (PlayerPawn)
+		{
+			// We overlapped with a player!
 
-	ASCharacter* PlayerPawn = Cast<ASCharacter>(OtherActor);
-	if (PlayerPawn)
-	{
-		// We overlapped with a player!
+			if (Role == ROLE_Authority)
+			{
+				// Start self destruction sequence
+				GetWorldTimerManager().SetTimer(TimerHandle_SelfDamage, this, &ASTrackerBot::DamageSelf, SelfDamageInterval, true, 0.0f);
+			}
 
-		// Start self destruction sequence
-		GetWorldTimerManager().SetTimer(TimerHandle_SelfDamage, this, &ASTrackerBot::DamageSelf, SelfDamageInterval, true, 0.0f);
+			// UE_LOG(LogTemp, Log, TEXT("ASTrackerBot::NotifyActorBeginOverlap bStartedSelfDestruction: TRUE"));
 
-		// UE_LOG(LogTemp, Log, TEXT("ASTrackerBot::NotifyActorBeginOverlap bStartedSelfDestruction: TRUE"));
+			bStartedSelfDestruction = true;
 
-		bStartedSelfDestruction = true;
-
-		UGameplayStatics::SpawnSoundAttached(SelfDestructSound, RootComponent);
+			UGameplayStatics::SpawnSoundAttached(SelfDestructSound, RootComponent);
+		}
 	}
 }
