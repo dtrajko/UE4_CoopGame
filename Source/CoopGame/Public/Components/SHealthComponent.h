@@ -40,6 +40,6 @@ public:
 	FOnHealthChangedSignature OnHealthChanged;
 
 	UFUNCTION(BlueprintCallable, Category = "HealthComponent")
-	void Heal(float Amount);
+	void Heal(float HealAmount);
 
 };
