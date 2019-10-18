@@ -36,7 +36,7 @@ protected:
 
 	ASPowerupActor* PowerUpInstance;
 
-	UPROPERTY(EditDefaultsOnly, Category = "PickupActor")
+	UPROPERTY(EditAnywhere, Category = "PickupActor")
 	float CooldownDuration;
 
 	FTimerHandle TimerHandle_RespawnTimer;
