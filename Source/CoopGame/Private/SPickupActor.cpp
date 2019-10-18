@@ -11,6 +11,8 @@
 // Sets default values
 ASPickupActor::ASPickupActor()
 {
+	PrimaryActorTick.bCanEverTick = true;
+
 	SphereComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
 	SphereComp->SetSphereRadius(75.0f);
 	RootComponent = SphereComp;
@@ -54,5 +56,19 @@ void ASPickupActor::NotifyActorBeginOverlap(AActor* OtherActor)
 
 		// Set Timer to respawn
 		GetWorldTimerManager().SetTimer(TimerHandle_RespawnTimer, this, &ASPickupActor::Respawn, CooldownDuration);
+	}
+}
+
+void ASPickupActor::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	if (PowerUpInstance)
+	{
+		PowerUpInstance->AddActorLocalRotation(FRotator(0.0f, RotationSpeed, 0.0f));
+
+		VerticalAngle += VerticalSpeed * DeltaTime;
+		float offsetZ = FMath::Cos(VerticalAngle) * VerticalRange;
+		PowerUpInstance->AddActorLocalOffset(FVector(0.0f, 0.0f, offsetZ));
 	}
 }

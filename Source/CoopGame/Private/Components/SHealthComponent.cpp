@@ -3,6 +3,7 @@
 
 #include "SHealthComponent.h"
 #include "Net/UnrealNetwork.h"
+#include "..\..\Public\Components\SHealthComponent.h"
 
 
 // Sets default values for this component's properties
@@ -51,6 +52,12 @@ void USHealthComponent::HandleTakeAnyDamage(AActor* DamagedActor, float Damage, 
 	UE_LOG(LogTemp, Log, TEXT("Health Changed: %s"), *FString::SanitizeFloat(Health));
 
 	OnHealthChanged.Broadcast(this, Health, Damage, DamageType, InstigatedBy, DamageCauser);
+}
+
+void USHealthComponent::Heal(float Amount)
+{
+	Health = FMath::Clamp(Health + Amount, 0.0f, DefaultHealth);
+	OnHealthChanged.Broadcast(this, Health, -Amount, nullptr, nullptr, nullptr);
 }
 
 void USHealthComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
