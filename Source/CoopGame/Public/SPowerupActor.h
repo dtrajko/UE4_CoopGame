@@ -16,8 +16,6 @@ public:
 	ASPowerupActor();
 
 protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
 
 	/* Time between powerup ticks */
 	UPROPERTY(EditDefaultsOnly, Category = "Powerups")
@@ -25,7 +23,7 @@ protected:
 
 	/* Total times we apply the powerup effect */
 	UPROPERTY(EditDefaultsOnly, Category = "Powerups")
-	int32 TotalNrOfTicks;
+	int32 TotalNumberOfTicks;
 
 	FTimerHandle TimerHandle_PowerupTick;
 
@@ -35,10 +33,34 @@ protected:
 	UFUNCTION()
 	void OnTickPowerup();
 
+	// Keeps state of the power-up
+	UPROPERTY(ReplicatedUsing = OnRep_PowerupActive)
+	bool bIsPowerupActive;
+
+	UFUNCTION()
+	void OnRep_PowerupActive();
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "Powerups")
+	void OnPowerupStateChanged(bool nNewIsActive);
+
+	// Rotation and vertical movement
+	UPROPERTY(EditDefaultsOnly, Category = "Movement")
+	float RotationSpeed = 0.8f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Movement")
+	float VerticalSpeed = 1.0f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Movement")
+	float VerticalRange = 0.25f;
+
+	float VerticalAngle = 0.0f;
+
 
 public:
 
 	void ActivatePowerup();
+
+	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "Powerups")
 	void OnActivated();
@@ -49,5 +71,6 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "Powerups")
 	void OnExpired();
 
+	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const;
 
 };

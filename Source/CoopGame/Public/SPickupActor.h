@@ -43,21 +43,8 @@ protected:
 
 	void Respawn();
 
-	// Rotation and vertical movement
-	UPROPERTY(EditDefaultsOnly, Category = "Movement")
-	float RotationSpeed = 0.8f;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Movement")
-	float VerticalSpeed = 1.0f;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Movement")
-	float VerticalRange = 0.25f;
-
-	float VerticalAngle = 0.0f;
 
 public:
-
-	virtual void Tick(float DeltaTime) override;
 
 	virtual void NotifyActorBeginOverlap(AActor* OtherActor) override;
 
