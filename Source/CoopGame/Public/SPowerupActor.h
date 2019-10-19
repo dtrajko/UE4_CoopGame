@@ -40,12 +40,9 @@ protected:
 	UFUNCTION()
 	void OnRep_PowerupActive();
 
-	UFUNCTION(BlueprintImplementableEvent, Category = "Powerups")
-	void OnPowerupStateChanged(bool nNewIsActive);
-
 	// Rotation and vertical movement
 	UPROPERTY(EditDefaultsOnly, Category = "Movement")
-	float RotationSpeed = 0.8f;
+	float RotationSpeed = 0.0f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Movement")
 	float VerticalSpeed = 1.0f;
@@ -64,6 +61,9 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "Powerups")
 	void OnActivated();
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "Powerups")
+	void OnPowerupStateChanged(bool nNewIsActive);
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "Powerups")
 	void OnPowerupTicked();
