@@ -55,12 +55,12 @@ protected:
 
 public:
 
-	void ActivatePowerup();
+	void ActivatePowerup(AActor* ActiveFor);
 
 	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "Powerups")
-	void OnActivated();
+	void OnActivated(AActor* ActiveFor);
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "Powerups")
 	void OnPowerupStateChanged(bool nNewIsActive);
