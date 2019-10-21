@@ -78,7 +78,8 @@ protected:
 	bool bDied;
 
 
-public:	
+public:
+
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
