@@ -66,10 +66,6 @@ protected:
 	UPROPERTY(VisibleDefaultsOnly, Category = "Player")
 	FName WeaponAttachSocketName;
 
-	void StartFire();
-
-	void StopFire();
-
 	UFUNCTION()
 	void OnHealthChanged(USHealthComponent* OwningHealthComp, float Health, float HealthDelta, const class UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser);
 
@@ -80,6 +76,7 @@ protected:
 
 public:
 
+
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
@@ -89,5 +86,14 @@ public:
 	virtual FVector GetPawnViewLocation() const override;
 
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const;
+
+	UFUNCTION(BlueprintCallable, Category = "Player")
+	void StartFire();
+
+	UFUNCTION(BlueprintCallable, Category = "Player")
+	void StopFire();
+
+	UFUNCTION(BlueprintCallable, Category = "Player")
+	void SetDied(bool bDiedValue);
 
 };

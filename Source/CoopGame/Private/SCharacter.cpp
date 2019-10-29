@@ -113,6 +113,11 @@ void ASCharacter::StopFire()
 	}
 }
 
+void ASCharacter::SetDied(bool bDiedValue)
+{
+	bDied = bDiedValue;
+}
+
 void ASCharacter::OnHealthChanged(USHealthComponent* OwningHealthComp, float Health, float HealthDelta, const class UDamageType* DamageType,
 	AController* InstigatedBy, AActor* DamageCauser)
 {
