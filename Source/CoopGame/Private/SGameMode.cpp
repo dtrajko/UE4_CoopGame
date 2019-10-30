@@ -10,7 +10,7 @@
 
 ASGameMode::ASGameMode()
 {
-	TimeBetweenWaves = 3.0f;
+	TimeBetweenWaves = 6.0f;
 
 	GameStateClass = ASGameState::StaticClass();
 	PlayerStateClass = ASPlayerState::StaticClass();
@@ -29,38 +29,9 @@ void ASGameMode::StartWave()
 	SetWaveState(EWaveState::WaveInProgress);
 }
 
-void ASGameMode::StartPlay()
-{
-	Super::StartPlay();
-
-	PrepareForNextWave();
-}
-
-void ASGameMode::Tick(float DeltaSeconds)
-{
-	Super::Tick(DeltaSeconds);
-
-	CheckWaveState();
-	CheckAnyPlayerAlive();
-}
-
-void ASGameMode::SpawnBotTimerElapsed()
-{
-	SpawnNewBot();
-
-	NumberOfBotsToSpawn++;
-
-	if (NumberOfBotsToSpawn <= 0)
-	{
-		EndWave();
-	}
-}
-
 void ASGameMode::EndWave()
 {
 	GetWorldTimerManager().ClearTimer(TimerHandle_BotSpawner);
-
-	// PrepareForNextWave();
 
 	SetWaveState(EWaveState::WaitingToComplete);
 }
@@ -138,7 +109,7 @@ void ASGameMode::GameOver()
 
 	SetWaveState(EWaveState::GameOver);
 
-	UE_LOG(LogTemp, Log, TEXT("Game Over, players died!"));
+	// UE_LOG(LogTemp, Log, TEXT("Game Over, players died!"));
 }
 
 void ASGameMode::SetWaveState(EWaveState NewState)
@@ -159,5 +130,32 @@ void ASGameMode::RestartDeadPlayers()
 		{
 			RestartPlayer(PC);
 		}
+	}
+}
+
+void ASGameMode::StartPlay()
+{
+	Super::StartPlay();
+
+	PrepareForNextWave();
+}
+
+void ASGameMode::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	CheckWaveState();
+	CheckAnyPlayerAlive();
+}
+
+void ASGameMode::SpawnBotTimerElapsed()
+{
+	SpawnNewBot();
+
+	NumberOfBotsToSpawn--;
+
+	if (NumberOfBotsToSpawn <= 0)
+	{
+		EndWave();
 	}
 }
