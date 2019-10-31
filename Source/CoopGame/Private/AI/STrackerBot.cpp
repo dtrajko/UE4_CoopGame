@@ -51,8 +51,8 @@ ASTrackerBot::ASTrackerBot()
 	RequiredDistanceToTarget = 200.0f;
 
 	bExploded = false;
-	ExplosionDamage = 40.0f;
-	ExplosionRadius = 250;
+	ExplosionDamage = 60.0f;
+	ExplosionRadius = 350;
 
 	bStartedSelfDestruction = false;
 	SelfDamageInterval = 0.25f;
@@ -87,7 +87,7 @@ void ASTrackerBot::HandleTakeDamage(USHealthComponent* OwningHealthComp, float H
 		MatInst->SetScalarParameterValue("LastTimeDamageTaken", GetWorld()->TimeSeconds);
 	}
 
-	UE_LOG(LogTemp, Log, TEXT("Health %s of %s"), *FString::SanitizeFloat(Health), *GetName());
+	// UE_LOG(LogTemp, Log, TEXT("Health %s of %s"), *FString::SanitizeFloat(Health), *GetName());
 
 	// Explode on hitpoints = 0
 	if (Health <= 0.0f)
@@ -98,14 +98,41 @@ void ASTrackerBot::HandleTakeDamage(USHealthComponent* OwningHealthComp, float H
 
 FVector ASTrackerBot::GetNextPathPoint()
 {
-	ACharacter* PlayerPawn = UGameplayStatics::GetPlayerCharacter(this, 0);
+	AActor* BestTargetActor = nullptr;
+	float NearestTargetDistance = FLT_MAX;
 
-	UNavigationPath* NavPath = UNavigationSystemV1::FindPathToActorSynchronously(GetWorld(), GetActorLocation(), PlayerPawn);
-
-	if (NavPath && NavPath->PathPoints.Num() > 1)
+	for (FConstPawnIterator It = GetWorld()->GetPawnIterator(); It; ++It)
 	{
-		// Return next point in the path
-		return NavPath->PathPoints[1];
+		APawn* TestPawn = It->Get();
+		if (TestPawn == nullptr || USHealthComponent::IsFriendly(TestPawn, this))
+		{
+			continue;
+		}
+
+		USHealthComponent* TestPawnHealthComp = Cast<USHealthComponent>(TestPawn->GetComponentByClass(USHealthComponent::StaticClass()));
+		if (TestPawnHealthComp && TestPawnHealthComp->GetHealth() > 0.0f)
+		{
+			float Distance = (TestPawn->GetActorLocation() - GetActorLocation()).Size();
+			if (Distance < NearestTargetDistance)
+			{
+				BestTargetActor = TestPawn;
+				NearestTargetDistance = Distance;
+			}
+		}
+	}
+
+	if (BestTargetActor)
+	{
+		UNavigationPath* NavPath = UNavigationSystemV1::FindPathToActorSynchronously(GetWorld(), GetActorLocation(), BestTargetActor);
+
+		GetWorldTimerManager().ClearTimer(TimerHandle_RefreshPath);
+		GetWorldTimerManager().SetTimer(TimerHandle_RefreshPath, this, &ASTrackerBot::RefreshPath, 5.0f, false);
+
+		if (NavPath && NavPath->PathPoints.Num() > 1)
+		{
+			// Return next point in the path
+			return NavPath->PathPoints[1];
+		}
 	}
 
 	// Failed to find path
@@ -146,7 +173,10 @@ void ASTrackerBot::SelfDestruct()
 		// Apply damage!
 		UGameplayStatics::ApplyRadialDamage(GetWorld(), ActualDamage, GetActorLocation(), ExplosionRadius, nullptr, IgnoredActors, this, GetInstigatorController(), true);
 
-		DrawDebugSphere(GetWorld(), GetActorLocation(), ExplosionRadius, 12, FColor::Blue, false, 2.0f, 0, 1.0f);
+		if (DebugTrackerBotDrawing)
+		{
+			DrawDebugSphere(GetWorld(), GetActorLocation(), ExplosionRadius, 12, FColor::Blue, false, 2.0f, 0, 1.0f);
+		}
 
 		SetLifeSpan(2.0f);
 	}
@@ -171,7 +201,11 @@ void ASTrackerBot::Tick(float DeltaTime)
 		if (DistanceToTarget <= RequiredDistanceToTarget)
 		{
 			RefreshPath();
-			DrawDebugString(GetWorld(), GetActorLocation(), "Target reached!", nullptr, FColor::Blue, 1.0f);
+
+			if (DebugTrackerBotDrawing)
+			{
+				DrawDebugString(GetWorld(), GetActorLocation(), "Target reached!", nullptr, FColor::Blue, 1.0f);
+			}
 		}
 		else
 		{
@@ -182,10 +216,16 @@ void ASTrackerBot::Tick(float DeltaTime)
 
 			MeshComp->AddForce(ForceDirection, NAME_None, bUseVelocityChange);
 
-			DrawDebugDirectionalArrow(GetWorld(), GetActorLocation(), GetActorLocation() + ForceDirection, 32, FColor::Yellow, false, 0.0f, 0, 1.0f);
+			if (DebugTrackerBotDrawing)
+			{
+				DrawDebugDirectionalArrow(GetWorld(), GetActorLocation(), GetActorLocation() + ForceDirection, 32, FColor::Yellow, false, 0.0f, 0, 1.0f);
+			}
 		}
 
-		DrawDebugSphere(GetWorld(), NextPathPoint, 20, 12, FColor::Yellow, false, 0.0f, 1.0f);
+		if (DebugTrackerBotDrawing)
+		{
+			DrawDebugSphere(GetWorld(), NextPathPoint, 20, 12, FColor::Yellow, false, 0.0f, 1.0f);
+		}
 	}
 }
 
@@ -196,7 +236,7 @@ void ASTrackerBot::NotifyActorBeginOverlap(AActor* OtherActor)
 	if (!bStartedSelfDestruction && !bExploded)
 	{
 		ASCharacter* PlayerPawn = Cast<ASCharacter>(OtherActor);
-		if (PlayerPawn)
+		if (PlayerPawn && !USHealthComponent::IsFriendly(OtherActor, this))
 		{
 			// We overlapped with a player!
 
