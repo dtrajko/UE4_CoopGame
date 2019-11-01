@@ -58,7 +58,7 @@ void USHealthComponent::HandleTakeAnyDamage(AActor* DamagedActor, float Damage, 
 	// Update Health clamped
 	Health = FMath::Clamp(Health - Damage, 0.0f, DefaultHealth);
 
-	// UE_LOG(LogTemp, Log, TEXT("Health Changed: %s"), *FString::SanitizeFloat(Health));
+	UE_LOG(LogTemp, Log, TEXT("Health Changed: %s"), *FString::SanitizeFloat(Health));
 
 	bIsDead = Health <= 0.0f;
 
@@ -85,11 +85,16 @@ void USHealthComponent::Heal(float HealAmount)
 	{
 		return;
 	}
-	Health = FMath::Clamp(Health + HealAmount, 0.0f, DefaultHealth);
 
-	UE_LOG(LogTemp, Log, TEXT("Health changed: %s (+%s)"), *FString::SanitizeFloat(Health), *FString::SanitizeFloat(HealAmount));
+	APawn* MyOwner = Cast<APawn>(GetOwner());
+	if (MyOwner == nullptr || MyOwner->IsPlayerControlled())
+	{
+		Health = FMath::Clamp(Health + HealAmount, 0.0f, DefaultHealth);
 
-	OnHealthChanged.Broadcast(this, Health, -HealAmount, nullptr, nullptr, nullptr);
+		UE_LOG(LogTemp, Log, TEXT("Health changed: %s (+%s)"), *FString::SanitizeFloat(Health), *FString::SanitizeFloat(HealAmount));
+
+		OnHealthChanged.Broadcast(this, Health, -HealAmount, nullptr, nullptr, nullptr);
+	}
 }
 
 bool USHealthComponent::IsFriendly(AActor* ActorA, AActor* ActorB)

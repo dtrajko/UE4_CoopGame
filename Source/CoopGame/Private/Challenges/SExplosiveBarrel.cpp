@@ -60,6 +60,8 @@ void ASExplosiveBarrel::OnHealthChanged(USHealthComponent* OwningHealthComp, flo
 		}
 
 		// @TODO: Apply radial damage
+
+		Destroy();
 	}
 }
 

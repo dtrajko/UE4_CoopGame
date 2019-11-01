@@ -99,7 +99,7 @@ void ASCharacter::EndZoom()
 
 void ASCharacter::StartFire()
 {
-	if (CurrentWeapon && !bDied)
+	if (CurrentWeapon)
 	{
 		CurrentWeapon->StartFire();
 	}
@@ -107,7 +107,7 @@ void ASCharacter::StartFire()
 
 void ASCharacter::StopFire()
 {
-	if (CurrentWeapon)
+	if (CurrentWeapon || bDied)
 	{
 		CurrentWeapon->StopFire();
 	}

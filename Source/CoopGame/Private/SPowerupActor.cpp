@@ -62,11 +62,11 @@ void ASPowerupActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-		AddActorLocalRotation(FRotator(0.0f, RotationSpeed, 0.0f));
+	AddActorLocalRotation(FRotator(0.0f, RotationSpeed, 0.0f));
 
-		VerticalAngle += VerticalSpeed * DeltaTime;
-		float offsetZ = FMath::Cos(VerticalAngle) * VerticalRange;
-		AddActorLocalOffset(FVector(0.0f, 0.0f, offsetZ));
+	VerticalAngle += VerticalSpeed * DeltaTime;
+	float offsetZ = FMath::Cos(VerticalAngle) * VerticalRange;
+	AddActorLocalOffset(FVector(0.0f, 0.0f, offsetZ));
 }
 
 void ASPowerupActor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

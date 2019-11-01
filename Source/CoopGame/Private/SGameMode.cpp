@@ -101,6 +101,26 @@ void ASGameMode::CheckAnyPlayerAlive()
 	GameOver();
 }
 
+void ASGameMode::MakeSurePlayersCanKillEachOther()
+{
+	// Players can kill each other if their team numbers are different
+	uint8 teamID = 0;
+	for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+	{
+		APlayerController* PC = It->Get();
+		if (PC && PC->GetPawn())
+		{
+			APawn* MyPawn = PC->GetPawn();
+			USHealthComponent* HealthComp = Cast<USHealthComponent>(MyPawn->GetComponentByClass(USHealthComponent::StaticClass()));
+			if (ensure(HealthComp) && HealthComp->GetHealth() > 0.0f)
+			{
+				HealthComp->TeamNumber = teamID;
+				teamID++;
+			}
+		}
+	}
+}
+
 void ASGameMode::GameOver()
 {
 	EndWave();
@@ -146,6 +166,7 @@ void ASGameMode::Tick(float DeltaSeconds)
 
 	CheckWaveState();
 	CheckAnyPlayerAlive();
+	MakeSurePlayersCanKillEachOther();
 }
 
 void ASGameMode::SpawnBotTimerElapsed()

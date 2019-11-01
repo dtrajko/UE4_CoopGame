@@ -62,6 +62,8 @@ protected:
 
 	void RestartDeadPlayers();
 
+	void MakeSurePlayersCanKillEachOther();
+
 
 public:
 
