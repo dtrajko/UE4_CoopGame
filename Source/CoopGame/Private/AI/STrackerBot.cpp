@@ -3,16 +3,14 @@
 
 #include "STrackerBot.h"
 #include "SCharacter.h"
-#include "..\..\Public\AI\STrackerBot.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/SHealthComponent.h"
 #include "Components/SphereComponent.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "GameFramework/Character.h"
-#include <Runtime\Engine\Classes\Kismet\GameplayStatics.h>
-#include <Runtime\NavigationSystem\Public\NavigationSystem.h>
-#include <Runtime\NavigationSystem\Public\NavigationPath.h>
+#include "Kismet\GameplayStatics.h"
 #include "NavigationSystem.h"
+#include "NavigationPath.h"
 #include "Sound/SoundCue.h"
 #include "DrawDebugHelpers.h"
 

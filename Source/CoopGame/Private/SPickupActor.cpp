@@ -54,6 +54,19 @@ void ASPickupActor::NotifyActorBeginOverlap(AActor* OtherActor)
 {
 	Super::NotifyActorBeginOverlap(OtherActor);
 
+	bool bPlayerControlled = false;
+	APawn* MyPawn = Cast<APawn>(OtherActor);
+	if (MyPawn && MyPawn->IsPlayerControlled())
+	{
+		bPlayerControlled = true;
+	}
+
+	// Pickups should not be activated by AI pawns
+	if (!bPlayerControlled)
+	{
+		return;
+	}
+
 	if (Role == ROLE_Authority && PowerUpInstance)
 	{
 		PowerUpInstance->ActivatePowerup(OtherActor);

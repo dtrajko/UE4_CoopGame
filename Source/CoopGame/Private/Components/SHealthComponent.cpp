@@ -87,7 +87,7 @@ void USHealthComponent::Heal(float HealAmount)
 	}
 
 	APawn* MyOwner = Cast<APawn>(GetOwner());
-	if (MyOwner && MyOwner->IsLocallyControlled())
+	if (MyOwner && MyOwner->IsPlayerControlled())
 	{
 		Health = FMath::Clamp(Health + HealAmount, 0.0f, DefaultHealth);
 

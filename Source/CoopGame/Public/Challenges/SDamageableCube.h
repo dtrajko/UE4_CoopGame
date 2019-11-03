@@ -43,18 +43,20 @@ protected:
 	UFUNCTION()
 		void OnRep_Exploded();
 
+	/* Particle to play when health reached zero */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FX")
+		UParticleSystem* ExplosionEffect;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FX")
+		class USoundBase* ExplosionSound;
+
 	/* Impulse applied to the barrel mesh when it explodes to boost it up a little */
 	UPROPERTY(EditDefaultsOnly, Category = "FX")
 		float ExplosionImpulse;
 
-	/* Particle to play when health reached zero */
-	UPROPERTY(EditDefaultsOnly, Category = "FX")
-		UParticleSystem* ExplosionEffect;
 
 	/* The material to replace the original on the mesh once exploded (a blackened version) */
 	UPROPERTY(EditDefaultsOnly, Category = "FX")
 		UMaterialInterface* ExplodedMaterial;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FX")
-		class USoundBase* ExplosionSound;
 };

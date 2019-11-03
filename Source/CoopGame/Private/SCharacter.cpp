@@ -12,6 +12,8 @@
 #include "GameFramework/PawnMovementComponent.h"
 #include "GameFramework/Character.h"
 #include "Net/UnrealNetwork.h"
+#include "Kismet/GameplayStatics.h"
+#include "Sound/SoundCue.h"
 
 
 // Sets default values
@@ -128,13 +130,18 @@ void ASCharacter::OnHealthChanged(USHealthComponent* OwningHealthComp, float Hea
 		GetMovementComponent()->StopMovementImmediately();
 		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
+		if (DeathSound)
+		{
+			UGameplayStatics::PlaySoundAtLocation(this, DeathSound, GetActorLocation());
+		}
+
 		if (CurrentWeapon)
 		{
-			CurrentWeapon->SetLifeSpan(10.0f);
+			CurrentWeapon->SetLifeSpan(2.0f);
 		}
 
 		DetachFromControllerPendingDestroy();
-		SetLifeSpan(10.0f);
+		SetLifeSpan(4.0f);
 	}
 }
 

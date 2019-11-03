@@ -7,10 +7,12 @@
 #include "SCharacter.generated.h"
 
 
+class USoundCue;
 class UCameraComponent;
 class USpringArmComponent;
 class ASWeapon;
 class USHealthComponent;
+
 
 UCLASS()
 class COOPGAME_API ASCharacter : public ACharacter
@@ -72,6 +74,9 @@ protected:
 	// Pawn died previously
 	UPROPERTY(Replicated, BlueprintReadOnly, Category = "Player")
 	bool bDied;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Player")
+	USoundCue* DeathSound;
 
 
 public:
