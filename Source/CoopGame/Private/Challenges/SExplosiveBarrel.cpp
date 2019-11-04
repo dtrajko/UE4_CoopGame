@@ -11,7 +11,7 @@
 ASExplosiveBarrel::ASExplosiveBarrel()
 {
 	HealthComp = CreateDefaultSubobject<USHealthComponent>(TEXT("HealthComp"));
-	HealthComp->OnHealthChanged.AddDynamic(this, &ASExplosiveBarrel::OnHealthChanged);
+	HealthComp->OnHealthChanged.AddDynamic(this, &ASExplosiveBarrel::HandleTakeDamage);
 
 	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));
 	MeshComp->SetSimulatePhysics(true);
@@ -32,7 +32,7 @@ ASExplosiveBarrel::ASExplosiveBarrel()
 	SetReplicateMovement(true);
 }
 
-void ASExplosiveBarrel::OnHealthChanged(USHealthComponent* OwningHealthComp, float Health, float HealthDelta, const class UDamageType* DamageType,
+void ASExplosiveBarrel::HandleTakeDamage(USHealthComponent* OwningHealthComp, float Health, float HealthDelta, const class UDamageType* DamageType,
 	class AController* InstigatedBy, AActor* DamageCauser)
 {
 	if (bExploded)
@@ -45,7 +45,11 @@ void ASExplosiveBarrel::OnHealthChanged(USHealthComponent* OwningHealthComp, flo
 	{
 		// Explode!
 		bExploded = true;
-		OnRep_Exploded();
+		
+		// Play FX and change self material to black
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ExplosionEffect, GetActorLocation());
+		// Override material on mesh with blackened version
+		MeshComp->SetMaterial(0, ExplodedMaterial);
 
 		// Boost the barrel upwards
 		FVector BoostIntensity = FVector::UpVector * ExplosionImpulse;
@@ -65,18 +69,3 @@ void ASExplosiveBarrel::OnHealthChanged(USHealthComponent* OwningHealthComp, flo
 	}
 }
 
-void ASExplosiveBarrel::OnRep_Exploded()
-{
-	// Play FX and change self material to black
-	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ExplosionEffect, GetActorLocation());
-	// Override material on mesh with blackened version
-	MeshComp->SetMaterial(0, ExplodedMaterial);
-}
-
-
-void ASExplosiveBarrel::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
-{
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
-	DOREPLIFETIME(ASExplosiveBarrel, bExploded);
-}

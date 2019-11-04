@@ -34,14 +34,10 @@ protected:
 	URadialForceComponent* RadialForceComp;
 
 	UFUNCTION()
-	void OnHealthChanged(USHealthComponent* OwningHealthComp, float Health, float HealthDelta, const class UDamageType* DamageType,
+	void HandleTakeDamage(USHealthComponent* OwningHealthComp, float Health, float HealthDelta, const class UDamageType* DamageType,
 		class AController* InstigatedBy, AActor* DamageCauser);
 
-	UPROPERTY(ReplicatedUsing = OnRep_Exploded)
 	bool bExploded;
-
-	UFUNCTION()
-	void OnRep_Exploded();
 
 	/* Impulse applied to the barrel mesh when it explodes to boost it up a little */
 	UPROPERTY(EditDefaultsOnly, Category = "FX")
