@@ -3,19 +3,18 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Pawn.h"
+#include "GameFramework/Actor.h"
 #include "SDamageableCube.generated.h"
 
 
 class USHealthComponent;
-class UBoxComponent;
 class UStaticMeshComponent;
 class URadialForceComponent;
 class UParticleSystem;
 
 
 UCLASS()
-class COOPGAME_API ASDamageableCube : public APawn
+class COOPGAME_API ASDamageableCube : public AActor
 {
 	GENERATED_BODY()
 
@@ -25,47 +24,39 @@ public:
 
 protected:
 
-	UPROPERTY(VisibleDefaultsOnly, Category = "Components")
-	UStaticMeshComponent* MeshComp;
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+		USHealthComponent* HealthComp;
 
-	UPROPERTY(VisibleDefaultsOnly, Category = "Components")
-	USHealthComponent* HealthComp;
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+		UStaticMeshComponent* MeshComp;
 
-	UPROPERTY(VisibleDefaultsOnly, Category = "Components")
-	UBoxComponent* BoxComp;
-
-	UPROPERTY(VisibleDefaultsOnly, Category = "Components")
-	URadialForceComponent* RadialForceComp;
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+		URadialForceComponent* RadialForceComp;
 
 	UFUNCTION()
-	void HandleTakeDamage(USHealthComponent* OwningHealthComp, float Health, float HealthDelta, const class UDamageType* DamageType,
-		class AController* InstigatedBy, AActor* DamageCauser);
+		void OnHealthChanged(USHealthComponent* OwningHealthComp, float Health, float HealthDelta, const class UDamageType* DamageType,
+			class AController* InstigatedBy, AActor* DamageCauser);
 
-	void ApplyDamage(float Health);
+	UPROPERTY(ReplicatedUsing = OnRep_Exploded)
+		bool bExploded;
 
-	void SelfDestruct();
-
-	bool bExploded;
-
-	UPROPERTY(EditDefaultsOnly, Category = "TrackerBot")
-	float ExplosionRadius;
-
-	UPROPERTY(EditDefaultsOnly, Category = "TrackerBot")
-	float ExplosionDamage;
+	UFUNCTION()
+		void OnRep_Exploded();
 
 	/* Particle to play when health reached zero */
-	UPROPERTY(EditDefaultsOnly, Category = "FX")
-	UParticleSystem* ExplosionEffect;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FX")
+		UParticleSystem* ExplosionEffect;
 
-	UPROPERTY(EditDefaultsOnly, Category = "FX")
-	class USoundBase* ExplodeSound;
-
-	/* The material to replace the original on the mesh once exploded (a blackened version) */
-	UPROPERTY(EditDefaultsOnly, Category = "FX")
-	UMaterialInterface* ExplodedMaterial;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FX")
+		class USoundBase* ExplosionSound;
 
 	/* Impulse applied to the barrel mesh when it explodes to boost it up a little */
 	UPROPERTY(EditDefaultsOnly, Category = "FX")
-	float ExplosionImpulse;
+		float ExplosionImpulse;
+
+
+	/* The material to replace the original on the mesh once exploded (a blackened version) */
+	UPROPERTY(EditDefaultsOnly, Category = "FX")
+		UMaterialInterface* ExplodedMaterial;
 
 };
