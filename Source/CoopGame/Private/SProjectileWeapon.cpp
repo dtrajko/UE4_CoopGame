@@ -16,8 +16,8 @@ void ASProjectileWeapon::Fire()
 		FRotator EyeRotation;
 		MyOwner->GetActorEyesViewPoint(EyeLocation, EyeRotation);
 
-		FVector MuzzleLocation = MeshComp->GetSocketLocation(MuzzleSocketName);
-		FRotator MuzzleRotation = MeshComp->GetSocketRotation(MuzzleSocketName);
+		FVector MuzzleLocation = SkeletalMeshComp->GetSocketLocation(MuzzleSocketName);
+		FRotator MuzzleRotation = SkeletalMeshComp->GetSocketRotation(MuzzleSocketName);
 
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
@@ -28,7 +28,7 @@ void ASProjectileWeapon::Fire()
 
 		if (MuzzleEffect)
 		{
-			UGameplayStatics::SpawnEmitterAttached(MuzzleEffect, MeshComp, MuzzleSocketName);
+			UGameplayStatics::SpawnEmitterAttached(MuzzleEffect, SkeletalMeshComp, MuzzleSocketName);
 		}
 
 		// try and play the sound if specified

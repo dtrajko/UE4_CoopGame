@@ -19,8 +19,11 @@ FAutoConsoleVariableRef CVARDebugWeaponDrawing(TEXT("COOP.DebugWeapons"), DebugW
 // Sets default values
 ASWeapon::ASWeapon()
 {
-	MeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("MeshComp"));
-	RootComponent = MeshComp;
+	StaticMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComp"));
+	RootComponent = StaticMeshComp;
+
+	SkeletalMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMeshComp"));
+	SkeletalMeshComp->SetupAttachment(StaticMeshComp);
 
 	MuzzleSocketName = "MuzzleSocket";
 	TracerTargetName = "BeamEnd";
@@ -170,7 +173,7 @@ void ASWeapon::PlayImpactEffects(EPhysicalSurface SurfaceType, FVector ImpactPoi
 
 	if (SelectedEffect)
 	{
-		FVector MuzzleLocation = MeshComp->GetSocketLocation(MuzzleSocketName);
+		FVector MuzzleLocation = SkeletalMeshComp->GetSocketLocation(MuzzleSocketName);
 		FVector ShotDirection = ImpactPoint - MuzzleLocation;
 		ShotDirection.Normalize();
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), SelectedEffect, ImpactPoint, ShotDirection.Rotation());
@@ -182,12 +185,12 @@ void ASWeapon::PlayFireEffects(FVector TracerEndPoint)
 {
 	if (MuzzleEffect)
 	{
-		UGameplayStatics::SpawnEmitterAttached(MuzzleEffect, MeshComp, MuzzleSocketName);
+		UGameplayStatics::SpawnEmitterAttached(MuzzleEffect, SkeletalMeshComp, MuzzleSocketName);
 	}
 
 	if (TracerEffect)
 	{
-		FVector MuzzleLocation = MeshComp->GetSocketLocation(MuzzleSocketName);
+		FVector MuzzleLocation = SkeletalMeshComp->GetSocketLocation(MuzzleSocketName);
 
 		UParticleSystemComponent* TracerComp = UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), TracerEffect, MuzzleLocation);
 		if (TracerComp)

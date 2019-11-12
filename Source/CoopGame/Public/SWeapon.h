@@ -42,8 +42,11 @@ protected:
 
 	virtual void BeginPlay() override;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-	USkeletalMeshComponent* MeshComp;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
+	UStaticMeshComponent* StaticMeshComp;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
+	USkeletalMeshComponent* SkeletalMeshComp;
 
 	void PlayFireEffects(FVector TracerEndPoint);
 
